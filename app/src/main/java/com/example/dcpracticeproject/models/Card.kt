@@ -9,3 +9,12 @@ data class Card(
     val url: String,
     val set: String
 )
+
+fun Card.toCardDb(): CardDB{
+    return CardDB(
+        name = this.name,
+        url = this.url,
+        tier = this.tier,
+        set = this.set
+    )
+}

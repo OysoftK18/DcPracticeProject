@@ -13,7 +13,7 @@ import com.example.dcpracticeproject.data.CardsDBRepository
 import com.example.dcpracticeproject.data.CardsRepository
 import com.example.dcpracticeproject.di.CardsApplication
 import com.example.dcpracticeproject.models.Card
-import com.example.dcpracticeproject.models.CardDB
+import com.example.dcpracticeproject.models.toCardDb
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -50,15 +50,10 @@ class TestViewModel(private val cardsRepository: CardsRepository, private val ca
             when(cardsUiState){
                 is CardsUiState.Success -> {
                     val lista = cardsRepository.getAllCards()
-                    val firstCard = lista[0]
-                    cardsDBRepository.insertCard(cardDB = CardDB(
-                        name = firstCard.name,
-                        tier = firstCard.tier,
-                        set = firstCard.set,
-                        url = firstCard.url
-                    )
-                    )
-                    Log.e("Test", firstCard.toString())
+                    for (card in lista){
+                        cardsDBRepository.insertCard(cardDB = card.toCardDb())
+                    }
+
                 }
                 else -> Log.e("Test", "Nothing")
             }
