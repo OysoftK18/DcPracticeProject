@@ -1,11 +1,9 @@
 package com.example.dcpracticeproject.di
 
 import android.content.Context
-import com.example.dcpracticeproject.data.CardsDBRepository
 import com.example.dcpracticeproject.data.CardsDatabase
 import com.example.dcpracticeproject.data.CardsRepository
 import com.example.dcpracticeproject.data.DefaultCardsRepository
-import com.example.dcpracticeproject.data.OfflineCardsDBRepository
 import com.example.dcpracticeproject.network.CardsApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -15,8 +13,6 @@ import retrofit2.Retrofit
 interface DcContainer {
 
     val cardsRepository : CardsRepository
-
-    val cardsDBRepository: CardsDBRepository
 }
 
 class DefaultDcContainer(context: Context) : DcContainer {
@@ -33,10 +29,7 @@ class DefaultDcContainer(context: Context) : DcContainer {
     }
 
     override val cardsRepository: CardsRepository by lazy{
-        DefaultCardsRepository(retrofitService)
+        DefaultCardsRepository(retrofitService, CardsDatabase.getDataBase(context).cardsDao())
     }
 
-    override val cardsDBRepository: CardsDBRepository by lazy {
-        OfflineCardsDBRepository(CardsDatabase.getDataBase(context).cardsDao())
-    }
 }
