@@ -32,19 +32,19 @@ import com.example.dcpracticeproject.models.CardDB
 fun HomeScreen(viewModel: HomeViewModel ) {
 
     val databaseUiState by viewModel.databaseUiState.collectAsState()
-
-    if (databaseUiState.cardList.isNotEmpty()){
-        SuccessScreen(cardList = databaseUiState.cardList)
-    }else{
-        Button(onClick = { viewModel.onUpdateDataBaseClicked() }) {
-            Text(text = "Populate List")
+    Column {
+            Button(onClick = { viewModel.shuffleMainHeroes() }, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Get Players HEROES")
+            }
+        if (databaseUiState.cardList.isNotEmpty()){
+            SuccessScreen(cardList = databaseUiState.cardList)
+        }else{
+            when(viewModel.fetchUiState){
+                is FetchUiState.Loading -> LoadingScreen { viewModel.retrieveDataOnlineAndPopulateDatabase() }
+                FetchUiState.Failed -> FailedScreen()
+                else -> null
+            }
         }
-    }
-
-    when(viewModel.fetchUiState){
-        is FetchUiState.Loading -> LoadingScreen()
-        FetchUiState.Failed -> FailedScreen()
-        else -> null
     }
 }
 
@@ -60,13 +60,14 @@ fun FailedScreen() {
 }
 
 @Composable
-fun LoadingScreen() {
+fun LoadingScreen(retrieveCards: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
+        retrieveCards
     }
 }
 

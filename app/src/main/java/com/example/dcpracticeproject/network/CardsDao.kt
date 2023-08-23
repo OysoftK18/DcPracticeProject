@@ -18,4 +18,7 @@ interface CardsDao {
 
     @Query("SELECT * FROM cards WHERE id=:id LIMIT 1")
     fun getCard(id: Int): CardDB
+
+    @Query("SELECT * FROM cards WHERE tier=:tier")
+    fun getCardsLocalTier(tier: Int): Flow<List<CardDB>>
 }

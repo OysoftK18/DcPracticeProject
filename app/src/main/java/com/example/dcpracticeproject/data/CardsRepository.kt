@@ -24,6 +24,9 @@ interface CardsRepository {
     @Query("SELECT * FROM cards WHERE id=:id LIMIT 1")
     fun getCardLocal(id: Int): CardDB
 
+    @Query("SELECT * FROM cards WHERE tier=:tier")
+    fun getCardsLocalTier(tier: Int): Flow<List<CardDB>>
+
 
 }
 
@@ -35,5 +38,7 @@ class DefaultCardsRepository(private val cardsApiService: CardsApiService, priva
     override fun getAllCardsLocal(): Flow<List<CardDB>> = cardsDao.getAllCards()
 
     override fun getCardLocal(id: Int): CardDB = cardsDao.getCard(id)
+
+    override fun getCardsLocalTier(tier: Int): Flow<List<CardDB>> = cardsDao.getCardsLocalTier(tier)
 
 }

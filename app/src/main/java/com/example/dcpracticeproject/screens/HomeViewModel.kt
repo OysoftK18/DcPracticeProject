@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dcpracticeproject.data.CardsRepository
+import com.example.dcpracticeproject.data.RoastGenerator
 import com.example.dcpracticeproject.models.Card
 import com.example.dcpracticeproject.models.CardDB
 import com.example.dcpracticeproject.models.toCardDb
@@ -27,7 +28,7 @@ sealed interface FetchUiState{
     object Nothing: FetchUiState
 }
 
-class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() {
+class HomeViewModel(private val cardsRepository: CardsRepository, private val roastGenerator: RoastGenerator = RoastGenerator()) : ViewModel() {
 
     var fetchUiState: FetchUiState by mutableStateOf(FetchUiState.Nothing)
         private set
@@ -36,8 +37,12 @@ class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() 
         scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000L), initialValue = DatabaseUiState()
     )
 
+    fun shuffleMainHeroes(){
+        roastGenerator.getPlayersRoast(2)
+    }
 
-    fun onUpdateDataBaseClicked(){
+
+    fun retrieveDataOnlineAndPopulateDatabase(){
         viewModelScope.launch {
             fetchUiState = FetchUiState.Loading
             fetchUiState = try {
