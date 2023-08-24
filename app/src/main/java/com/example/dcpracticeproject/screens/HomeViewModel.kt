@@ -18,48 +18,52 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-sealed interface FetchUiState{
-    data class Success(val list: List<Card>): FetchUiState
+sealed interface FetchUiState {
+    data class Success(val list: List<Card>) : FetchUiState
 
     object Failed : FetchUiState
 
-    object Loading: FetchUiState
+    object Loading : FetchUiState
 
-    object Nothing: FetchUiState
+    object Nothing : FetchUiState
 }
 
-class HomeViewModel(private val cardsRepository: CardsRepository, private val roastGenerator: RoastGenerator = RoastGenerator()) : ViewModel() {
+class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() {
 
     var fetchUiState: FetchUiState by mutableStateOf(FetchUiState.Nothing)
         private set
 
-    val databaseUiState: StateFlow<DatabaseUiState> = cardsRepository.getAllCardsLocal().map { DatabaseUiState(it) }.stateIn(
-        scope = viewModelScope, started = SharingStarted.WhileSubscribed(5_000L), initialValue = DatabaseUiState()
-    )
+    val databaseUiState: StateFlow<DatabaseUiState> =
+        cardsRepository.getAllCardsLocal().map { DatabaseUiState(it) }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = DatabaseUiState()
+        )
 
-    fun shuffleMainHeroes(){
-        roastGenerator.getPlayersRoast(2)
+    fun shuffleMainHeroes() {
+        RoastGenerator.getPlayersRoast(2)
     }
 
 
-    fun retrieveDataOnlineAndPopulateDatabase(){
+    fun retrieveDataOnlineAndPopulateDatabase() {
         viewModelScope.launch {
             fetchUiState = FetchUiState.Loading
             fetchUiState = try {
                 FetchUiState.Success(cardsRepository.getAllCards())
-            }catch (e: IOException){
+            } catch (e: IOException) {
                 FetchUiState.Failed
-            }catch (e: HttpException){
+            } catch (e: HttpException) {
                 FetchUiState.Failed
             }
 
-            when(fetchUiState){
+            when (fetchUiState) {
                 is FetchUiState.Success -> {
                     val cardList = cardsRepository.getAllCards()
-                    for (card in cardList){
+                    for (card in cardList) {
                         cardsRepository.insertCardLocal(cardDB = card.toCardDb())
                     }
                 }
+
                 else -> null
             }
         }

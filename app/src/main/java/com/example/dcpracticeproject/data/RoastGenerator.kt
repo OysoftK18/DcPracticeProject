@@ -3,7 +3,7 @@ package com.example.dcpracticeproject.data
 import android.util.Log
 import kotlin.random.Random
 
-class RoastGenerator {
+object RoastGenerator {
     private fun getCombinationHeroes(): MutableList<Int>{
         val random =  Random.Default
         var num1: Int
