@@ -37,7 +37,7 @@ fun HomeScreen(viewModel: HomeViewModel ) {
                 Text(text = "Get Players HEROES")
             }
         if (databaseUiState.cardList.isNotEmpty()){
-            SuccessScreen(cardList = databaseUiState.cardList)
+            CardListScreen(cardList = databaseUiState.cardList)
         }else{
             when(viewModel.fetchUiState){
                 is FetchUiState.Loading -> LoadingScreen { viewModel.retrieveDataOnlineAndPopulateDatabase() }
@@ -72,7 +72,7 @@ fun LoadingScreen(retrieveCards: () -> Unit) {
 }
 
 @Composable
-fun SuccessScreen(cardList: List<CardDB>) {
+fun CardListScreen(cardList: List<CardDB>) {
     LazyColumn() {
         items(cardList) {
             Card(
