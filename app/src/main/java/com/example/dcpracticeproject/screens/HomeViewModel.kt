@@ -1,5 +1,6 @@
 package com.example.dcpracticeproject.screens
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,7 +29,7 @@ sealed interface FetchUiState {
     object Nothing : FetchUiState
 }
 
-class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() {
+class HomeViewModel(private val cardsRepository: CardsRepository, private val roastGenerator: RoastGenerator = RoastGenerator(cardsRepository)) : ViewModel() {
 
     var fetchUiState: FetchUiState by mutableStateOf(FetchUiState.Nothing)
         private set
@@ -41,7 +42,9 @@ class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() 
         )
 
     fun shuffleMainHeroes() {
-        RoastGenerator.getPlayersRoast(2)
+        viewModelScope.launch {
+            roastGenerator.getPlayersRoast(2)
+        }
     }
 
 
@@ -64,7 +67,8 @@ class HomeViewModel(private val cardsRepository: CardsRepository) : ViewModel() 
                     }
                 }
 
-                else -> null
+                else -> Log.d("Fetch status: ", "Something went wrong" )
+
             }
         }
     }

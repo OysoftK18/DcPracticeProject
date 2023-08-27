@@ -25,6 +25,7 @@ abstract class CardsDatabase : RoomDatabase() {
                     name = "cards_database"
                 )
                     .fallbackToDestructiveMigration()
+                    .allowMainThreadQueries()
                     .build().also {
                         INSTANCE = it
                     }
