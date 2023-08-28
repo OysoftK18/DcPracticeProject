@@ -29,18 +29,28 @@ import com.example.dcpracticeproject.boldAndNormal
 import com.example.dcpracticeproject.models.CardDB
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel ) {
+fun HomeScreen(viewModel: HomeViewModel) {
 
     val databaseUiState by viewModel.databaseUiState.collectAsState()
     Column {
-            Button(onClick = { viewModel.shuffleMainHeroes() }, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Get Players HEROES")
+
+        if (databaseUiState.cardList.isNotEmpty()) {
+            if (viewModel.heroesList.isNotEmpty()) {
+                PlayerDisplayed(viewModel.heroesList)
+            } else {
+                Button(onClick = {
+                    viewModel.shuffleMainHeroes()
+                }, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Get Players HEROES")
+                }
             }
-        if (databaseUiState.cardList.isNotEmpty()){
-            CardListScreen(cardList = databaseUiState.cardList)
-        }else{
-            when(viewModel.fetchUiState){
-                is FetchUiState.Loading -> LoadingScreen { viewModel.retrieveDataOnlineAndPopulateDatabase() }
+        } else {
+            when (viewModel.fetchUiState) {
+                is FetchUiState.Loading -> {
+                    LoadingScreen()
+                    viewModel.retrieveDataOnlineAndPopulateDatabase()
+                }
+
                 FetchUiState.Failed -> FailedScreen()
                 else -> null
             }
@@ -60,17 +70,17 @@ fun FailedScreen() {
 }
 
 @Composable
-fun LoadingScreen(retrieveCards: () -> Unit) {
+fun LoadingScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
-        retrieveCards
     }
 }
 
+/**Function to display everything that is in the database if needed */
 @Composable
 fun CardListScreen(cardList: List<CardDB>) {
     LazyColumn() {
@@ -82,9 +92,43 @@ fun CardListScreen(cardList: List<CardDB>) {
                     .padding(2.dp),
                 elevation = CardDefaults.elevatedCardElevation(10.dp)
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp)
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current).data(it.url)
+                            .crossfade(true).build(),
+                        contentDescription = it.name,
+                        modifier = Modifier
+                            .width(60.dp)
+                            .fillMaxHeight()
+                    )
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = boldAndNormal("Name: ", it.name))
+                        Text(text = boldAndNormal("Set: ", it.set))
+                        Text(text = boldAndNormal("Tier: ", it.tier))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerDisplayed(heroesList: List<List<CardDB>>) {
+    LazyColumn() {
+        items(heroesList) {
+            it.forEach {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp)
+                ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).data(it.url)
                             .crossfade(true).build(),

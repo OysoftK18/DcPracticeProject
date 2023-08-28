@@ -34,6 +34,8 @@ class HomeViewModel(private val cardsRepository: CardsRepository, private val ro
     var fetchUiState: FetchUiState by mutableStateOf(FetchUiState.Nothing)
         private set
 
+    var heroesList: List<List<CardDB>> by mutableStateOf(emptyList())
+
     val databaseUiState: StateFlow<DatabaseUiState> =
         cardsRepository.getAllCardsLocal().map { DatabaseUiState(it) }.stateIn(
             scope = viewModelScope,
@@ -43,7 +45,7 @@ class HomeViewModel(private val cardsRepository: CardsRepository, private val ro
 
     fun shuffleMainHeroes() {
         viewModelScope.launch {
-            roastGenerator.getPlayersRoast(2)
+            heroesList = roastGenerator.getPlayersRoast(2)
         }
     }
 
@@ -66,9 +68,7 @@ class HomeViewModel(private val cardsRepository: CardsRepository, private val ro
                         cardsRepository.insertCardLocal(cardDB = card.toCardDb())
                     }
                 }
-
                 else -> Log.d("Fetch status: ", "Something went wrong" )
-
             }
         }
     }

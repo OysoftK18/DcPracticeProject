@@ -25,7 +25,7 @@ interface CardsRepository {
     fun getCardLocal(id: Int): CardDB
 
     @Query("SELECT * FROM cards WHERE tier=:tier")
-    fun getCardsLocalTier(tier: Int): List<CardDB>
+    suspend fun getCardsLocalTier(tier: Int): List<CardDB>
 
 
 }
@@ -39,6 +39,6 @@ class DefaultCardsRepository(private val cardsApiService: CardsApiService, priva
 
     override fun getCardLocal(id: Int): CardDB = cardsDao.getCard(id)
 
-    override fun getCardsLocalTier(tier: Int): List<CardDB> = cardsDao.getCardsLocalTier(tier)
+    override suspend fun getCardsLocalTier(tier: Int): List<CardDB> = cardsDao.getCardsLocalTier(tier)
 
 }

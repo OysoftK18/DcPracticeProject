@@ -1,6 +1,7 @@
 package com.example.dcpracticeproject.data
 
 import android.util.Log
+import com.example.dcpracticeproject.models.CardDB
 import kotlin.random.Random
 
 class RoastGenerator(val repository: CardsRepository) {
@@ -18,26 +19,28 @@ class RoastGenerator(val repository: CardsRepository) {
         return mutableListOf(num1, num2)
     }
 
-     fun getPlayersRoast(players: Int) {
-         val combinations: MutableList<MutableList<Int>> = mutableListOf()
+    suspend fun getPlayersRoast(players: Int): List<List<CardDB>> {
+        val combinations: MutableList<MutableList<Int>> = mutableListOf()
         repeat(players) {
             combinations.add(getCombinationHeroes())
         }
         Log.d("Heroes", combinations.toString())
 
         //TODO get the heroes from the database
+        val heroes : MutableList<List<CardDB>> = mutableListOf()
         for (player in combinations) {
-            Log.d("Heroes", getHeroesFromDatabase(player).toString())
+            heroes.add(getHeroesFromDatabase(player))
         }
+        return heroes
     }
 
-    private fun getHeroesFromDatabase(list: List<Int>): List<String> {
-        val listOfHeroes: MutableList<String> = mutableListOf()
+    private suspend fun getHeroesFromDatabase(list: List<Int>): List<CardDB> {
+        val listOfHeroes: MutableList<CardDB> = mutableListOf()
         list.forEach {
             val tierList = repository.getCardsLocalTier(it)
 
-            val heroNumber = random.nextInt(1, tierList.size+1)
-            listOfHeroes.add(tierList[heroNumber].name)
+            val heroNumber = random.nextInt(1, tierList.size + 1)
+            listOfHeroes.add(tierList[heroNumber])
         }
         return listOfHeroes.toList()
     }
